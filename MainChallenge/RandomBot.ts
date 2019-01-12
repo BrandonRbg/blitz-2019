@@ -1,5 +1,5 @@
-import {Action} from './Action';
-import {Board} from './Board';
+import { Action } from './Action';
+import { Board } from './Board';
 
 export class RandomBot {
     initialize(board: any, players: number[], timeLeft: number | null) {

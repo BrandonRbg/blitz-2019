@@ -1,19 +1,19 @@
 import * as xmlrpc from 'xmlrpc';
 import * as yargs from 'yargs';
-import {RandomBot} from './RandomBot';
+import { RandomBot } from './RandomBot';
 
 var argv = yargs
-  .number('p')
-  .number('port')
-  .argv
+    .number('p')
+    .number('port')
+    .argv
 const PORT = argv.port || argv.p || 4000;
-const server = xmlrpc.createServer( { host: '0.0.0.0', port: PORT }, () => {
+const server = xmlrpc.createServer({host: '0.0.0.0', port: PORT}, () => {
     console.log(`Server listening on port ${PORT}`);
 });
 
 const agent = new RandomBot();
 
-server.on('NotFound', function(method, params) {
+server.on('NotFound', function (method, params) {
     console.log('Method ' + method + ' does not exist');
 });
 
