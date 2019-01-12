@@ -143,34 +143,46 @@ export class Board {
         return this.pawns.filter(p => p.i === coord.i + 2 && p.j === coord.j).length > 0;
     }
 
-    canMoveRight(coord: Coords): boolean {
-        return !this.hasPlayerRight(coord) && !this.hasWallBlockingRight(coord);
+    canMoveRight(coord: Coords, checkPlayers = true): boolean {
+        if (checkPlayers) {
+            return !this.hasPlayerRight(coord) && !this.hasWallBlockingRight(coord);
+        }
+        return !this.hasWallBlockingRight(coord);
     }
 
-    canMoveLeft(coord: Coords): boolean {
-        return !this.hasPlayerLeft(coord) && !this.hasWallBlockingLeft(coord);
+    canMoveLeft(coord: Coords, checkPlayers = true): boolean {
+        if (checkPlayers) {
+            return !this.hasPlayerLeft(coord) && !this.hasWallBlockingLeft(coord);
+        }
+        return !this.hasWallBlockingLeft(coord);
     }
 
-    canMoveUp(coord: Coords): boolean {
-        return !this.hasPlayerUp(coord) && !this.hasWallBlockingUp(coord);
+    canMoveUp(coord: Coords, checkPlayers = true): boolean {
+        if (checkPlayers) {
+            return !this.hasPlayerUp(coord) && !this.hasWallBlockingUp(coord);
+        }
+        return !this.hasWallBlockingUp(coord);
     }
 
-    canMoveDown(coord: Coords): boolean {
-        return !this.hasPlayerDown(coord) && !this.hasWallBlockingDown(coord);
+    canMoveDown(coord: Coords, checkPlayers = true): boolean {
+        if (checkPlayers) {
+            return !this.hasPlayerDown(coord) && !this.hasWallBlockingDown(coord);
+        }
+        return !this.hasWallBlockingDown(coord);
     }
 
-    getSimpleMoves(coord: Coords): Coords[] {
+    getSimpleMoves(coord: Coords, checkPlayers = true): Coords[] {
         let moves: Coords[] = [];
-        if (this.canMoveRight(coord)) {
+        if (this.canMoveRight(coord, checkPlayers)) {
             moves.push(new Coords(coord.i, coord.j + 1));
         }
-        if (this.canMoveLeft(coord)) {
+        if (this.canMoveLeft(coord, checkPlayers)) {
             moves.push(new Coords(coord.i, coord.j - 1));
         }
-        if (this.canMoveUp(coord)) {
+        if (this.canMoveUp(coord, checkPlayers)) {
             moves.push(new Coords(coord.i - 1, coord.j));
         }
-        if (this.canMoveDown(coord)) {
+        if (this.canMoveDown(coord, checkPlayers)) {
             moves.push(new Coords(coord.i + 1, coord.j));
         }
         moves = moves.filter(this.isInBound.bind(this));
@@ -252,10 +264,9 @@ export class Board {
             }
             const possibleMoves = [];
             const goingHorizontal = goal.j != null;
-            const simpleMoves = this.getSimpleMoves(element);
             if (first) {
                 const orderedMoves: Coords[] = [];
-                for (const move of simpleMoves) {
+                for (const move of this.getSimpleMoves(element)) {
                     if (goingHorizontal) {
                         if (move.j === element.j) {
                             orderedMoves.unshift(move);
@@ -274,7 +285,7 @@ export class Board {
                 possibleMoves.push(...this.getDiagonalMoves(element));
                 possibleMoves.push(...this.getJumpMoves(element));
             } else {
-                possibleMoves.push(...simpleMoves);
+                possibleMoves.push(...this.getSimpleMoves(element, false));
             }
 
             possibleMoves.forEach(m => m.previous = element);
@@ -291,17 +302,132 @@ export class Board {
     canOtherPlayerGoTowardsGoal(player: number) {
         const coord = this.pawns[player];
         const goal = this.goals[player];
+        if (goal.j == null) {
+            if (goal.i - coord.i > 0) {
+                // Bas
+                return !this.hasWallBlockingDown(coord) && !this.hasPlayerDown(coord);
+            } else {
+                // Haut
+                return !this.hasWallBlockingUp(coord) && !this.hasPlayerUp(coord);
+            }
+        } else {
+            if (goal.j - coord.j > 0) {
+                // Droit
+                return !this.hasWallBlockingRight(coord) && !this.hasPlayerRight(coord);
+            } else {
+                // Gauche
+                return !this.hasWallBlockingLeft(coord) && !this.hasPlayerLeft(coord);
+            }
+        }
+    }
+
+    isVerticalWallInBound(coord: Coords): boolean {
+        return this.isInBound(coord) && this.isInBound(new Coords(coord.i + 1, coord.j));
+    }
+
+    isHorizontalWallInBound(coord: Coords): boolean {
+        return this.isInBound(coord) && this.isInBound(new Coords(coord.i, coord.j + 1));
+    }
+
+    canPlaceVerticalWall(coord: Coords): boolean {
+        return this.isVerticalWallInBound(coord) && !this.verticalWalls.find(c => {
+            return (c.i === coord.i && c.j === coord.j) || (c.i === coord.i - 1 && c.j === coord.j) || (c.i + 1 === coord.i && c.j === coord.j);
+        }) && !this.horizontalWalls.find(c => {
+            return c.i === coord.i && c.j === coord.j;
+        });
+    }
+
+    canPlaceHorizontalWall(coord: Coords): boolean {
+        return this.isHorizontalWallInBound(coord) && !this.horizontalWalls.find(c => {
+            return (c.i === coord.i && c.j === coord.j) || (c.i === coord.i && c.j === coord.j - 1) || (c.i === coord.i && c.j === coord.j + 1);
+        }) && !this.verticalWalls.find(c => {
+            return c.i === coord.i && c.j === coord.j;
+        });
+    }
+
+    // true pour horizontal false vertical
+    getWallPositionForPlayer(player: number): Action {
+        if (!this.canOtherPlayerGoTowardsGoal(player)) {
+            return null;
+        }
+        const coord = this.pawns[player];
+        const goal = this.goals[player];
+        if (goal.j == null) {
+            if (goal.i - coord.i > 0) {
+                // Bas
+                let newCoord = new Coords(coord.i, coord.j);
+                if (this.canPlaceHorizontalWall(newCoord)) {
+                    return new Action('WH', newCoord);
+                }
+                newCoord = new Coords(coord.i, coord.j - 1);
+                if (this.canPlaceHorizontalWall(newCoord)) {
+                    return new Action('WH', newCoord);
+                }
+            } else {
+                // Haut
+                let newCoord = new Coords(coord.i - 1, coord.j - 1);
+                if (this.canPlaceHorizontalWall(newCoord)) {
+                    return new Action('WH', newCoord);
+                }
+                newCoord = new Coords(coord.i - 1, coord.j);
+                if (this.canPlaceHorizontalWall(newCoord)) {
+                    return new Action('WH', newCoord);
+                }
+            }
+        } else {
+            if (goal.j - coord.j > 0) {
+                // Droit
+                let newCoord = new Coords(coord.i - 1, coord.j);
+                if (this.canPlaceVerticalWall(newCoord)) {
+                    return new Action('WV', newCoord);
+                }
+                newCoord = new Coords(coord.i, coord.j);
+                if (this.canPlaceVerticalWall(newCoord)) {
+                    return new Action('WV', newCoord);
+                }
+            } else {
+                // Gauche
+                let newCoord = new Coords(coord.i - 1, coord.j - 1);
+                if (this.canPlaceVerticalWall(newCoord)) {
+                    return new Action('WV', newCoord);
+                }
+                newCoord = new Coords(coord.i, coord.j - 1);
+                if (this.canPlaceVerticalWall(newCoord)) {
+                    return new Action('WV', newCoord);
+                }
+            }
+        }
+        return null;
+    }
+
+    hasOtherPlayerPassed(us: number, them: number): boolean {
+        if (this.goals[us].i - this.pawns[us].i > 0) {
+            // Bas
+            return this.pawns[us].i >= this.pawns[them].i;
+        } else {
+            // Haut
+            return this.pawns[us].i <= this.pawns[them].i;
+        }
     }
 
     getAction(player: number): Action {
         const coord = this.pawns[player];
         const goal = this.goals[player];
-        // switch (this.pawns.length) {
-        //     case 4:
-        //         return new Action('P', this.getMove(coord, goal));
-        //     case 2:
-        //
-        // }
+        switch (this.pawns.length) {
+            case 4:
+                return new Action('P', this.getMove(coord, goal));
+            case 2:
+                const otherPlayer = player === 0 ? 1 : 0;
+                if (this.nbWalls[player] > 0 && this.hasOtherPlayerPassed(player, otherPlayer)) {
+                    const wallAction = this.getWallPositionForPlayer(otherPlayer);
+                    if (wallAction != null) {
+                        return wallAction;
+                    }
+                } else {
+                    return new Action('P', this.getMove(coord, goal));
+                }
+
+        }
         return new Action('P', this.getMove(coord, goal));
     };
 
