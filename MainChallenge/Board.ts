@@ -226,7 +226,7 @@ export class Board {
             if (!this.hasDiagonalWallDownRightVertical(coord) && !this.hasPlayerRightDown(coord)) {
                 moves.push(new Coords(coord.i + 1, coord.j + 1));
             }
-            if (!this.hasDiagonalWallDownLeftVertical(coord)  && !this.hasPlayerLeftDown(coord)) {
+            if (!this.hasDiagonalWallDownLeftVertical(coord) && !this.hasPlayerLeftDown(coord)) {
                 moves.push(new Coords(coord.i + 1, coord.j - 1));
             }
         }
@@ -250,10 +250,33 @@ export class Board {
                 dest = element;
                 break;
             }
-            const possibleMoves = [
-                ...this.getSimpleMoves(element),
-                ...(first ? [...this.getJumpMoves(element), ...this.getDiagonalMoves(element)] : [])
-            ];
+            const possibleMoves = [];
+            const goingHorizontal = goal.j != null;
+            const simpleMoves = this.getSimpleMoves(element);
+            if (first) {
+                const orderedMoves: Coords[] = [];
+                for (const move of simpleMoves) {
+                    if (goingHorizontal) {
+                        if (move.j === element.j) {
+                            orderedMoves.unshift(move);
+                        } else {
+                            orderedMoves.push(move);
+                        }
+                    } else {
+                        if (move.i === element.i) {
+                            orderedMoves.unshift(move);
+                        } else {
+                            orderedMoves.push(move);
+                        }
+                    }
+                }
+                possibleMoves.push(...orderedMoves);
+                possibleMoves.push(...this.getDiagonalMoves(element));
+                possibleMoves.push(...this.getJumpMoves(element));
+            } else {
+                possibleMoves.push(...simpleMoves);
+            }
+
             possibleMoves.forEach(m => m.previous = element);
             queue.unshift(...possibleMoves);
             first = false;
@@ -265,10 +288,20 @@ export class Board {
         return nextMove;
     }
 
+    canOtherPlayerGoTowardsGoal(player: number) {
+        const coord = this.pawns[player];
+        const goal = this.goals[player];
+    }
+
     getAction(player: number): Action {
         const coord = this.pawns[player];
         const goal = this.goals[player];
-
+        // switch (this.pawns.length) {
+        //     case 4:
+        //         return new Action('P', this.getMove(coord, goal));
+        //     case 2:
+        //
+        // }
         return new Action('P', this.getMove(coord, goal));
     };
 
