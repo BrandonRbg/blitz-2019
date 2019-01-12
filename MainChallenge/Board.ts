@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
-import {Coords} from './Coords';
-import {Action} from './Action';
+import { Coords } from './Coords';
+import { Action } from './Action';
+import placeholder = require('lodash/fp/placeholder');
 
 export class Board {
     constructor(
@@ -12,27 +13,252 @@ export class Board {
         public rows: number,
         public cols: number,
         public size: number
-    ) {}
+    ) {
+    }
 
     canMoveHere(action: Action): boolean {
         const isInBound = 0 <= action.coord.i
-                          && action.coord.i < this.size
-                          && 0 <= action.coord.j && action.coord.j < this.size;
+            && action.coord.i < this.size
+            && 0 <= action.coord.j && action.coord.j < this.size;
         const isOnAnotherPlayer = _.some(this.pawns, (coords) => _.isEqual(action.coord, coords));
 
         return isInBound && !isOnAnotherPlayer;
     }
 
-    getActions(player: number): Action[] {
-        const coord = this.pawns[player];
-        const actions = [
-            new Action("P", new Coords(coord.i + 1, coord.j)),
-            new Action("P", new Coords(coord.i - 1, coord.j)),
-            new Action("P", new Coords(coord.i, coord.j + 1)),
-            new Action("P", new Coords(coord.i, coord.j - 1)),
-        ];
+    isInBound(coord: Coords) {
+        return 0 <= coord.i
+            && coord.i < this.size
+            && 0 <= coord.j && coord.j < this.size;
+    }
 
-        return actions.filter((action: Action) => this.canMoveHere(action));
+    hasWallBlockingRight(coord: Coords): boolean {
+        return this.verticalWalls.filter(w => w.j === coord.j && (w.i === coord.i || w.i === coord.i - 1)).length > 0;
+    }
+
+    hasWallBlockingLeft(coord: Coords): boolean {
+        return this.verticalWalls.filter(w => w.j === coord.j - 1 && (w.i === coord.i || w.i === coord.i - 1)).length > 0;
+    }
+
+    hasWallBlockingUp(coord: Coords): boolean {
+        return this.horizontalWalls.filter(w => w.i === coord.i - 1 && (w.j === coord.j || w.j === coord.j - 1)).length > 0;
+    }
+
+    hasWallBlockingDown(coord: Coords): boolean {
+        return this.horizontalWalls.filter(w => w.i === coord.i + 1 && (w.j === coord.j || w.j === coord.j - 1)).length > 0;
+    }
+
+    hasWallBlockingJumpRight(coord: Coords): boolean {
+        return this.verticalWalls.filter(w => (w.i === coord.i - 1 && w.j === coord.j + 1) || (w.i === coord.i && w.j === coord.j + 1)).length > 0;
+    }
+
+    hasWallBlockingJumpLeft(coord: Coords): boolean {
+        return this.verticalWalls.filter(w => (w.i === coord.i - 1 && w.j === coord.j - 2) || (w.i === coord.i && w.j === coord.j - 2)).length > 0;
+    }
+
+    hasWallBlockingJumpUp(coord: Coords): boolean {
+        return this.horizontalWalls.filter(w => (w.i === coord.i - 2 && w.j === coord.j - 1) || (w.i === coord.i - 2 && w.j === coord.j)).length > 0;
+    }
+
+    hasWallBlockingJumpDown(coord: Coords): boolean {
+        return this.horizontalWalls.filter(w => (w.i === coord.i + 1 && w.j === coord.j - 1) || (w.i === coord.i + 1 && w.j === coord.j)).length > 0;
+    }
+
+    hasDiagonalWallRightUpHorizontal(coord: Coords): boolean {
+        return this.horizontalWalls.filter(w => w.i === coord.i - 1 && w.j === coord.j).length > 0;
+    }
+
+    hasDiagonalWallRightDownHorizontal(coord: Coords): boolean {
+        return this.horizontalWalls.filter(w => w.i === coord.i && w.j === coord.j).length > 0;
+    }
+
+    hasDiagonalWallLeftUpHorizontal(coord: Coords): boolean {
+        return this.horizontalWalls.filter(w => w.i === coord.i - 1 && w.j === coord.j - 1).length > 0;
+    }
+
+    hasDiagonalWallLeftDownHorizontal(coord: Coords): boolean {
+        return this.horizontalWalls.filter(w => w.i === coord.i && w.j === coord.j - 1).length > 0;
+    }
+
+    hasDiagonalWallUpRightVertical(coord: Coords): boolean {
+        return this.verticalWalls.filter(w => w.i === coord.i - 1 && w.j === coord.j).length > 0;
+    }
+
+    hasDiagonalWallUpLeftVertical(coord: Coords): boolean {
+        return this.verticalWalls.filter(w => w.i === coord.i - 1 && w.j === coord.j - 1).length > 0;
+    }
+
+    hasDiagonalWallDownRightVertical(coord: Coords): boolean {
+        return this.verticalWalls.filter(w => w.i === coord.i && w.j === coord.j).length > 0;
+    }
+
+    hasDiagonalWallDownLeftVertical(coord: Coords): boolean {
+        return this.verticalWalls.filter(w => w.i === coord.i && w.j === coord.j - 1).length > 0;
+    }
+
+    hasPlayerRight(coord: Coords): boolean {
+        return this.pawns.filter(p => p.j === coord.j + 1).length > 0;
+    }
+
+    hasPlayerLeft(coord: Coords): boolean {
+        return this.pawns.filter(p => p.j === coord.j - 1).length > 0;
+    }
+
+    hasPlayerUp(coord: Coords): boolean {
+        return this.pawns.filter(p => p.i === coord.i - 1).length > 0;
+    }
+
+    hasPlayerDown(coord: Coords): boolean {
+        return this.pawns.filter(p => p.i === coord.i + 1).length > 0;
+    }
+
+    canMoveRight(coord: Coords): boolean {
+        return !this.hasPlayerRight(coord) && !this.hasWallBlockingRight(coord);
+    }
+
+    canMoveLeft(coord: Coords): boolean {
+        return !this.hasPlayerLeft(coord) && !this.hasWallBlockingLeft(coord);
+    }
+
+    canMoveUp(coord: Coords): boolean {
+        return !this.hasPlayerUp(coord) && !this.hasWallBlockingUp(coord);
+    }
+
+    canMoveDown(coord: Coords): boolean {
+        return !this.hasPlayerDown(coord) && !this.hasWallBlockingDown(coord);
+    }
+
+    getSimpleMoves(coord: Coords): Coords[] {
+        const moves: Coords[] = [];
+        if (this.canMoveRight(coord)) {
+            const newCoord = new Coords(coord.i, coord.j + 1);
+            if (this.isInBound(newCoord)) {
+                moves.push(newCoord);
+            }
+        }
+        if (this.canMoveLeft(coord)) {
+            const newCoord = new Coords(coord.i, coord.j - 1);
+            if (this.isInBound(newCoord)) {
+                moves.push(newCoord);
+            }
+        }
+        if (this.canMoveUp(coord)) {
+            const newCoord = new Coords(coord.i - 1, coord.j);
+            if (this.isInBound(newCoord)) {
+                moves.push(newCoord);
+            }
+        }
+        if (this.canMoveDown(coord)) {
+            const newCoord = new Coords(coord.i + 1, coord.j);
+            if (this.isInBound(newCoord)) {
+                moves.push(newCoord);
+            }
+        }
+        return moves;
+    }
+
+    getJumpMoves(coord: Coords): Coords[] {
+        const moves = [];
+
+        if (!this.hasWallBlockingRight(coord) && this.hasPlayerRight(coord) && !this.hasWallBlockingJumpRight(coord)) {
+            const newCoord = new Coords(coord.i, coord.j + 2);
+            if (this.isInBound(newCoord)) {
+                moves.push(newCoord);
+            }
+        }
+        if (!this.hasWallBlockingLeft(coord) && this.hasPlayerLeft(coord) && !this.hasWallBlockingJumpLeft(coord)) {
+            const newCoord = new Coords(coord.i, coord.j - 2);
+            if (this.isInBound(newCoord)) {
+                moves.push(newCoord);
+            }
+        }
+        if (!this.hasWallBlockingUp(coord) && this.hasPlayerUp(coord) && !this.hasWallBlockingJumpUp(coord)) {
+            const newCoord = new Coords(coord.i - 2, coord.j);
+            if (this.isInBound(newCoord)) {
+                moves.push(newCoord);
+            }
+        }
+        if (!this.hasWallBlockingDown(coord) && this.hasPlayerDown(coord) && !this.hasWallBlockingJumpDown(coord)) {
+            const newCoord = new Coords(coord.i + 2, coord.j);
+            if (this.isInBound(newCoord)) {
+                moves.push(newCoord);
+            }
+        }
+        return moves;
+    }
+
+    getDiagonalMoves(coord: Coords): Coords[] {
+        const moves = [];
+        if (!this.hasWallBlockingRight(coord) && this.hasPlayerRight(coord) && this.hasWallBlockingJumpRight(coord)) {
+            if (!this.hasDiagonalWallRightUpHorizontal(coord)) {
+                moves.push(new Coords(coord.i - 1, coord.j + 1));
+            }
+            if (!this.hasDiagonalWallRightDownHorizontal(coord)) {
+                moves.push(new Coords(coord.i + 1, coord.j + 1));
+            }
+        }
+        if (!this.hasWallBlockingLeft(coord) && this.hasPlayerLeft(coord) && this.hasWallBlockingJumpLeft(coord)) {
+            if (!this.hasDiagonalWallLeftUpHorizontal(coord)) {
+                moves.push(new Coords(coord.i - 1, coord.j - 1));
+            }
+            if (!this.hasDiagonalWallLeftDownHorizontal(coord)) {
+                moves.push(new Coords(coord.i + 1, coord.j - 1));
+            }
+        }
+        if (!this.hasWallBlockingUp(coord) && this.hasPlayerUp(coord) && this.hasWallBlockingJumpUp(coord)) {
+            if (!this.hasDiagonalWallUpRightVertical(coord)) {
+                moves.push(new Coords(coord.i - 1, coord.j - 1));
+            }
+            if (!this.hasDiagonalWallUpLeftVertical(coord)) {
+                moves.push(new Coords(coord.i - 1, coord.j + 1));
+            }
+        }
+        if (!this.hasWallBlockingDown(coord) && this.hasPlayerDown(coord) && this.hasWallBlockingJumpDown(coord)) {
+            if (!this.hasDiagonalWallDownRightVertical(coord)) {
+                moves.push(new Coords(coord.i + 1, coord.j + 1));
+            }
+            if (!this.hasDiagonalWallDownLeftVertical(coord)) {
+                moves.push(new Coords(coord.i + 1, coord.j - 1));
+            }
+        }
+        return moves.filter(this.isInBound.bind(this));
+    }
+
+    getMove(coord: Coords, goal: Coords): Coords {
+        const queue: Coords[] = [];
+        const visited: Coords[] = [];
+        queue.unshift(coord);
+        let first = true;
+        let dest: Coords;
+        while (queue.length !== 0) {
+            const element = queue.pop();
+            if (visited.find(v => v.i === element.i && v.j === element.j)) {
+                continue;
+            }
+            visited.push(element);
+            if (element.i === goal.i) {
+                dest = element;
+                break;
+            }
+            const possibleMoves = [
+                ...this.getSimpleMoves(element),
+                ...(first ? [...this.getJumpMoves(element), ...this.getDiagonalMoves(element)] : [])
+            ];
+            possibleMoves.forEach(m => m.previous = element);
+            queue.unshift(...possibleMoves);
+            first = false;
+        }
+        let nextMove = dest;
+        while (nextMove.previous.i !== coord.i && nextMove.previous.j !== coord.j) {
+            nextMove = nextMove.previous;
+        }
+        return nextMove;
+    }
+
+    getAction(player: number): Action {
+        const coord = this.pawns[player];
+        const goal = this.goals[player];
+
+        return new Action('P', this.getMove(coord, goal));
     };
 
     private static convertRawCoords([i, j]: number[]): Coords {

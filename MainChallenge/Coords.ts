@@ -1,6 +1,9 @@
 export class Coords {
     constructor(
-        public readonly i: number,
-        public readonly j: number
-    ) {}
+        public i: number,
+        public j: number,
+        public visited = false,
+        public previous: Coords = null
+    ) {
+    }
 }

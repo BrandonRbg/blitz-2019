@@ -1,6 +1,6 @@
 import * as xmlrpc from 'xmlrpc';
 import * as yargs from 'yargs';
-import { RandomBot } from './RandomBot';
+import { Bot } from './Bot';
 
 var argv = yargs
     .number('p')
@@ -11,7 +11,7 @@ const server = xmlrpc.createServer({host: '0.0.0.0', port: PORT}, () => {
     console.log(`Server listening on port ${PORT}`);
 });
 
-const agent = new RandomBot();
+const agent = new Bot();
 
 server.on('NotFound', function (method, params) {
     console.log('Method ' + method + ' does not exist');
