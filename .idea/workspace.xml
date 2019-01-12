@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e84381c2-68af-4c18-ab66-a85ff35cb595" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MainChallenge/Board.ts" beforeDir="false" afterPath="$PROJECT_DIR$/MainChallenge/Board.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MainChallenge/Coords.ts" beforeDir="false" afterPath="$PROJECT_DIR$/MainChallenge/Coords.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MainChallenge/MyBot.ts" beforeDir="false" afterPath="$PROJECT_DIR$/MainChallenge/MyBot.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MainChallenge/RandomBot.ts" beforeDir="false" afterPath="$PROJECT_DIR$/MainChallenge/Bot.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MainChallenge/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/MainChallenge/tsconfig.json" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -48,8 +45,17 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/MainChallenge/Board.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="63">
-              <caret line="227" column="26" selection-start-line="227" selection-start-column="26" selection-end-line="227" selection-end-column="26" />
+            <state relative-caret-position="471">
+              <caret line="145" column="32" selection-start-line="145" selection-start-column="32" selection-end-line="145" selection-end-column="32" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MainChallenge/MyBot.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="483">
+              <caret line="23" column="25" selection-start-line="23" selection-start-column="25" selection-end-line="23" selection-end-column="25" />
             </state>
           </provider>
         </entry>
@@ -106,6 +112,7 @@
         <option value="$PROJECT_DIR$/MainChallenge/Move.ts" />
         <option value="$PROJECT_DIR$/MainChallenge/Coords.ts" />
         <option value="$PROJECT_DIR$/MainChallenge/tsconfig.json" />
+        <option value="$PROJECT_DIR$/MainChallenge/Board.js" />
         <option value="$PROJECT_DIR$/MainChallenge/Board.ts" />
       </list>
     </option>
@@ -131,6 +138,12 @@
               <item name="blitz-2019" type="b2602c69:ProjectViewProjectNode" />
               <item name="blitz-2019" type="462c0819:PsiDirectoryNode" />
               <item name="MainChallenge" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="blitz-2019" type="b2602c69:ProjectViewProjectNode" />
+              <item name="blitz-2019" type="462c0819:PsiDirectoryNode" />
+              <item name="MainChallenge" type="462c0819:PsiDirectoryNode" />
+              <item name="Board.ts" type="620a8d5e:NestingTreeNode" />
             </path>
           </expand>
           <select />
@@ -174,12 +187,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1547298302916</updated>
-      <workItem from="1547298305459" duration="6807000" />
+      <workItem from="1547298305459" duration="8878000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="6807000" />
+    <option name="totallyTimeSpent" value="8878000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="-1080" width="1920" height="1080" extended-state="0" />
@@ -193,12 +206,12 @@
       <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" />
       <window_info anchor="bottom" id="Statistic" />
-      <window_info active="true" anchor="bottom" id="Terminal" visible="true" weight="0.32970297" />
+      <window_info anchor="bottom" id="Terminal" weight="0.32970297" />
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -218,6 +231,38 @@
         <option value="$PROJECT_DIR$/MainChallenge/Coords.js" />
       </list>
     </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <condition expression="coord.i === 3 &amp;&amp; coord.j === 4" language="JavaScript" />
+          <url>file://$PROJECT_DIR$/MainChallenge/Board.js</url>
+          <line>112</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="breakpointCondition">
+      <expression>
+        <expression-string>coord.i === 3 &amp;&amp; coord.j === 4</expression-string>
+        <language-id>JavaScript</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>coord.i === 7</expression-string>
+        <language-id>JavaScript</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>coord.i === 7</expression-string>
+        <language-id>TypeScript</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/Action.ts">
@@ -270,13 +315,6 @@
     <entry file="file://$PROJECT_DIR$/MainChallenge/package-lock.json">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/MainChallenge/package.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="13" column="18" selection-start-line="13" selection-start-column="18" selection-end-line="13" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/MainChallenge/Bot.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="273">
@@ -318,10 +356,31 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/MainChallenge/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="273">
+          <caret line="13" column="18" selection-start-line="13" selection-start-column="18" selection-end-line="13" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MainChallenge/MyBot.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="483">
+          <caret line="23" column="25" selection-start-line="23" selection-start-column="25" selection-end-line="23" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MainChallenge/Board.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="337">
+          <caret line="129" column="9" lean-forward="true" selection-start-line="129" selection-start-column="9" selection-end-line="129" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/MainChallenge/Board.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="63">
-          <caret line="227" column="26" selection-start-line="227" selection-start-column="26" selection-end-line="227" selection-end-column="26" />
+        <state relative-caret-position="471">
+          <caret line="145" column="32" selection-start-line="145" selection-start-column="32" selection-end-line="145" selection-end-column="32" />
         </state>
       </provider>
     </entry>

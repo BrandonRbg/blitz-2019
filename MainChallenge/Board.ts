@@ -96,19 +96,19 @@ export class Board {
     }
 
     hasPlayerRight(coord: Coords): boolean {
-        return this.pawns.filter(p => p.j === coord.j + 1).length > 0;
+        return this.pawns.filter(p => p.j === coord.j + 1 && p.i === coord.i).length > 0;
     }
 
     hasPlayerLeft(coord: Coords): boolean {
-        return this.pawns.filter(p => p.j === coord.j - 1).length > 0;
+        return this.pawns.filter(p => p.j === coord.j - 1 && p.i === coord.i).length > 0;
     }
 
     hasPlayerUp(coord: Coords): boolean {
-        return this.pawns.filter(p => p.i === coord.i - 1).length > 0;
+        return this.pawns.filter(p => p.i === coord.i - 1 && p.j === coord.j).length > 0;
     }
 
     hasPlayerDown(coord: Coords): boolean {
-        return this.pawns.filter(p => p.i === coord.i + 1).length > 0;
+        return this.pawns.filter(p => p.i === coord.i + 1 && p.j === coord.j).length > 0;
     }
 
     canMoveRight(coord: Coords): boolean {
@@ -128,31 +128,23 @@ export class Board {
     }
 
     getSimpleMoves(coord: Coords): Coords[] {
-        const moves: Coords[] = [];
+        let moves: Coords[] = [];
         if (this.canMoveRight(coord)) {
-            const newCoord = new Coords(coord.i, coord.j + 1);
-            if (this.isInBound(newCoord)) {
-                moves.push(newCoord);
-            }
+            moves.push(new Coords(coord.i, coord.j + 1));
         }
         if (this.canMoveLeft(coord)) {
-            const newCoord = new Coords(coord.i, coord.j - 1);
-            if (this.isInBound(newCoord)) {
-                moves.push(newCoord);
-            }
+            moves.push(new Coords(coord.i, coord.j - 1));
         }
         if (this.canMoveUp(coord)) {
-            const newCoord = new Coords(coord.i - 1, coord.j);
-            if (this.isInBound(newCoord)) {
-                moves.push(newCoord);
-            }
+            moves.push(new Coords(coord.i - 1, coord.j));
         }
         if (this.canMoveDown(coord)) {
-            const newCoord = new Coords(coord.i + 1, coord.j);
-            if (this.isInBound(newCoord)) {
-                moves.push(newCoord);
-            }
+            moves.push(new Coords(coord.i + 1, coord.j));
         }
+        moves = moves.filter(this.isInBound.bind(this));
+        console.log(coord);
+        console.log(this.pawns[1]);
+        console.log(moves);
         return moves;
     }
 
@@ -160,30 +152,18 @@ export class Board {
         const moves = [];
 
         if (!this.hasWallBlockingRight(coord) && this.hasPlayerRight(coord) && !this.hasWallBlockingJumpRight(coord)) {
-            const newCoord = new Coords(coord.i, coord.j + 2);
-            if (this.isInBound(newCoord)) {
-                moves.push(newCoord);
-            }
+            moves.push(new Coords(coord.i, coord.j + 2));
         }
         if (!this.hasWallBlockingLeft(coord) && this.hasPlayerLeft(coord) && !this.hasWallBlockingJumpLeft(coord)) {
-            const newCoord = new Coords(coord.i, coord.j - 2);
-            if (this.isInBound(newCoord)) {
-                moves.push(newCoord);
-            }
+            moves.push(new Coords(coord.i, coord.j - 2));
         }
         if (!this.hasWallBlockingUp(coord) && this.hasPlayerUp(coord) && !this.hasWallBlockingJumpUp(coord)) {
-            const newCoord = new Coords(coord.i - 2, coord.j);
-            if (this.isInBound(newCoord)) {
-                moves.push(newCoord);
-            }
+            moves.push(new Coords(coord.i - 2, coord.j));
         }
         if (!this.hasWallBlockingDown(coord) && this.hasPlayerDown(coord) && !this.hasWallBlockingJumpDown(coord)) {
-            const newCoord = new Coords(coord.i + 2, coord.j);
-            if (this.isInBound(newCoord)) {
-                moves.push(newCoord);
-            }
+            moves.push(new Coords(coord.i + 2, coord.j));
         }
-        return moves;
+        return moves.filter(this.isInBound.bind(this));
     }
 
     getDiagonalMoves(coord: Coords): Coords[] {
@@ -248,9 +228,12 @@ export class Board {
             first = false;
         }
         let nextMove = dest;
-        while (nextMove.previous.i !== coord.i && nextMove.previous.j !== coord.j) {
+        while (nextMove.previous.i !== coord.i || nextMove.previous.j !== coord.j) {
             nextMove = nextMove.previous;
+            console.log(nextMove.previous);
+            console.log(coord);
         }
+        console.log(nextMove);
         return nextMove;
     }
 
@@ -270,8 +253,8 @@ export class Board {
         const goals = percepts.goals.map(Board.convertRawCoords);
         const horizontalWalls = percepts.horiz_walls.map(Board.convertRawCoords);
         const verticalWalls = percepts.verti_walls.map(Board.convertRawCoords);
-        const {nbWalls, rows, cols, size} = percepts;
+        const {nb_walls, rows, cols, size} = percepts;
 
-        return new Board(pawns, goals, nbWalls, horizontalWalls, verticalWalls, rows, cols, size);
+        return new Board(pawns, goals, nb_walls, horizontalWalls, verticalWalls, rows, cols, size);
     }
 }
